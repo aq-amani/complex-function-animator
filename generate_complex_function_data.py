@@ -6,26 +6,52 @@ import multiprocessing
 from multiprocessing import Pool
 from datetime import datetime
 
-startTime = datetime.now()
-print(f'Started at {startTime}')
+import configparser
+import re
 
-polar = True
-data_path = './data/'
+config = configparser.ConfigParser()
+config.read('./config.ini')
+
+header = """
++-----------------------------+
+| (c) 2022 Amani AbuQdais     |
+| https://github.com/aq-amani |
++-----------------------------+
+"""
+
+POLAR = config.getboolean('GLOBAL', 'POLAR')
+DATA_PATH = config['GLOBAL']['DATA_PATH']
+
+# Read input intervals (start, end, step) to feed to np.arange
+# X --> Real part , Y --> Imagiary part of the function input.
+x_interval_settings = re.findall(r"[-+]?(?:\d*\.\d+|\d+)", config['GENERATOR']['X_INTERVAL'])
+y_interval_settings = re.findall(r"[-+]?(?:\d*\.\d+|\d+)", config['GENERATOR']['Y_INTERVAL'])
+# Input interval settings
+X = np.arange(*np.array(x_interval_settings, dtype=float))
+Y = np.arange(*np.array(y_interval_settings, dtype=float))
+X, Y = np.meshgrid(X, Y)
+S_ROWS, S_COLUMNS = X.shape
 
 def riemann_zeta(s):
     return mpmath.zeta(s)
 
-def inner_loop(xn):
+def complex_function_y_looper(xn):
+    """Loops over y values using one x value.
+    x and y and real and imaginary parts of the complex function input.
+
+    Arguments:
+    xn -- Fixed x value to loop over y values with
+    """
     out_r = []
     out_i = []
 
-    for yn in range(s_columns):
+    for yn in range(S_COLUMNS):
         try:
             s = complex(X[xn,yn],Y[xn,yn])
             z = mpmath.chop(riemann_zeta(s))
             if z != z:
                 raise ValueError
-            if polar:
+            if POLAR:
                 # Polar form
                 z_r, z_i = mpmath.polar(z)
                 # For polar form only. Convert negative angles to positive ones
@@ -45,48 +71,48 @@ def inner_loop(xn):
             out_i.append(np.nan)
     return out_r, out_i
 
-# Large part of the Riemann_zeta function plane
-# X = np.arange(-4, 4, 0.1)
-# Y = np.arange(-30, 30, 0.1)
-## Critical strip
-# X = np.arange(0, 1, 0.05)
-# Y = np.arange(-30, 30, 0.05)
-## Slice of the plane at the non-trivial zeros
-X = np.arange(0.5, 0.56, 0.05)
-Y = np.arange(-30, 30, 0.05)
+def generate_complex_data():
+    """Creates numpy arrays for X, Y, Z_r, Z_i and saves them in files
+    """
+    start_time = datetime.now()
+    print(f'{start_time.strftime("%Y-%m-%d %H:%M:%S")} Generating complex function data..')
+    Z_r = X*0
+    Z_i = X*0
+    # Use multiprocessing to speed things up
+    # Set worker count to the number of threads
+    worker_count = multiprocessing.cpu_count()
+    p = Pool(worker_count)
+    out = p.map(complex_function_y_looper, [xn for xn in range(S_ROWS)])
+    Z = np.asarray(out, dtype=float)
 
-X, Y = np.meshgrid(X, Y)
-s_rows, s_columns = X.shape
-Z_r = X*0
-Z_i = X*0
+    # Real part and imaginary part of the Riemann_zeta function output
+    Z_r = Z[:,0,:]
+    Z_i = Z[:,1,:]
 
-# Use multiprocessing to speed things up
-# Set worker count to the number of threads
-worker_count = multiprocessing.cpu_count()
-p = Pool(worker_count)
-out = p.map(inner_loop, [xn for xn in range(s_rows)])
-Z = np.asarray(out, dtype=float)
+    # Don't plot singularities
+    # cutoff value set to 5
+    Z_r[Z_r > 5] = np.nan
+    Z_r[Z_r < -5] = np.nan
 
-# Real part and imaginary part of the Riemann_zeta function output
-Z_r = Z[:,0,:]
-Z_i = Z[:,1,:]
+    # Save X, Y, Z_r, Z_i in files
+    with open(f'{DATA_PATH}Z_r.npy', 'wb') as fr:
+        np.save(fr, Z_r)
 
-# Don't plot singularities
-# cutoff value set to 5
-Z_r[Z_r > 5] = np.nan
-Z_r[Z_r < -5] = np.nan
+    with open(f'{DATA_PATH}Z_i.npy', 'wb') as fi:
+        np.save(fi, Z_i)
 
-# Save X, Y, Z_r, Z_i in files
-with open(f'{data_path}Z_r.npy', 'wb') as fr:
-    np.save(fr, Z_r)
+    with open(f'{DATA_PATH}X.npy', 'wb') as fx:
+        np.save(fx, X)
 
-with open(f'{data_path}Z_i.npy', 'wb') as fi:
-    np.save(fi, Z_i)
+    with open(f'{DATA_PATH}Y.npy', 'wb') as fy:
+        np.save(fy, Y)
 
-with open(f'{data_path}X.npy', 'wb') as fx:
-    np.save(fx, X)
+    finish_time = datetime.now()
+    print(f'{finish_time.strftime("%Y-%m-%d %H:%M:%S")} Done. Execution time with {worker_count} workers: [{finish_time - start_time}]')
 
-with open(f'{data_path}Y.npy', 'wb') as fy:
-    np.save(fy, Y)
+def main():
+    print(header)
+    generate_complex_data()
 
-print(f'Execution time with {worker_count} workers: {datetime.now() - startTime}')
+if __name__ == '__main__':
+    main()
