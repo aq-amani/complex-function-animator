@@ -10,6 +10,7 @@ startTime = datetime.now()
 print(f'Started at {startTime}')
 
 polar = True
+data_path = './data/'
 
 def riemann_zeta(s):
     return mpmath.zeta(s)
@@ -76,16 +77,16 @@ Z_r[Z_r > 5] = np.nan
 Z_r[Z_r < -5] = np.nan
 
 # Save X, Y, Z_r, Z_i in files
-with open('./Z_r.npy', 'wb') as fr:
+with open(f'{data_path}Z_r.npy', 'wb') as fr:
     np.save(fr, Z_r)
 
-with open('./Z_i.npy', 'wb') as fi:
+with open(f'{data_path}Z_i.npy', 'wb') as fi:
     np.save(fi, Z_i)
 
-with open('./X.npy', 'wb') as fx:
+with open(f'{data_path}X.npy', 'wb') as fx:
     np.save(fx, X)
 
-with open('./Y.npy', 'wb') as fy:
+with open(f'{data_path}Y.npy', 'wb') as fy:
     np.save(fy, Y)
 
 print(f'Execution time with {worker_count} workers: {datetime.now() - startTime}')
