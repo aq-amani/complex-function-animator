@@ -12,13 +12,6 @@ import re
 config = configparser.ConfigParser()
 config.read('./config.ini')
 
-header = """
-+-----------------------------+
-| (c) 2022 Amani AbuQdais     |
-| https://github.com/aq-amani |
-+-----------------------------+
-"""
-
 POLAR = config.getboolean('GLOBAL', 'POLAR')
 DATA_PATH = config['GLOBAL']['DATA_PATH']
 
@@ -111,7 +104,7 @@ def generate_complex_data():
     print(f'{finish_time.strftime("%Y-%m-%d %H:%M:%S")} Done. Execution time with {worker_count} workers: [{finish_time - start_time}]')
 
 def main():
-    print(header)
+    import header
     generate_complex_data()
 
 if __name__ == '__main__':

@@ -174,7 +174,7 @@ def plot_complex_data():
         print(f'{finish_time.strftime("%Y-%m-%d %H:%M:%S")} Done. Execution time with {worker_count} workers: [{finish_time - start_time}]')
 
 def main():
-    print(header)
+    import header
     plot_complex_data()
 
 if __name__ == '__main__':
