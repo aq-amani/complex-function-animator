@@ -25,8 +25,13 @@ Y = np.arange(*np.array(y_interval_settings, dtype=float))
 X, Y = np.meshgrid(X, Y)
 S_ROWS, S_COLUMNS = X.shape
 
-def riemann_zeta(s):
+def complex_function(s):
+    #return mpmath.besselj(1,s)
     return mpmath.zeta(s)
+    #return mpmath.loggamma(s)
+    #return mpmath.gamma(s)
+    #return mpmath.coulombf(6, 4, s)
+
 
 def complex_function_y_looper(xn):
     """Loops over y values using one x value.
@@ -41,7 +46,7 @@ def complex_function_y_looper(xn):
     for yn in range(S_COLUMNS):
         try:
             s = complex(X[xn,yn],Y[xn,yn])
-            z = mpmath.chop(riemann_zeta(s))
+            z = mpmath.chop(complex_function(s))
             if z != z:
                 raise ValueError
             if POLAR:
@@ -78,7 +83,7 @@ def generate_complex_data():
     out = p.map(complex_function_y_looper, [xn for xn in range(S_ROWS)])
     Z = np.asarray(out, dtype=float)
 
-    # Real part and imaginary part of the Riemann_zeta function output
+    # Real part and imaginary part of the complex_function function output
     Z_r = Z[:,0,:]
     Z_i = Z[:,1,:]
 
