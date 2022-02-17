@@ -15,6 +15,7 @@ config.read('./config.ini')
 POLAR = config.getboolean('GLOBAL', 'POLAR')
 DATA_PATH = config['GLOBAL']['DATA_PATH']
 
+Z_CUTOFF = int(config['GENERATOR']['Z_CUTOFF'])
 # Read input intervals (start, end, step) to feed to np.arange
 # X --> Real part , Y --> Imagiary part of the function input.
 x_interval_settings = re.findall(r"[-+]?(?:\d*\.\d+|\d+)", config['GENERATOR']['X_INTERVAL'])
@@ -88,9 +89,9 @@ def generate_complex_data():
     Z_i = Z[:,1,:]
 
     # Don't plot singularities
-    # cutoff value set to 5
-    Z_r[Z_r > 5] = np.nan
-    Z_r[Z_r < -5] = np.nan
+    # cutoff Z direction plotting at Z_CUTOFF value
+    Z_r[Z_r > Z_CUTOFF] = np.nan
+    Z_r[Z_r < -1*Z_CUTOFF] = np.nan
 
     # Save X, Y, Z_r, Z_i in files
     with open(f'{DATA_PATH}Z_r.npy', 'wb') as fr:

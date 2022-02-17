@@ -27,6 +27,7 @@ FRAMES_PATH = config['GLOBAL']['FRAMES_PATH']
 
 POLAR = config.getboolean('GLOBAL', 'POLAR')
 FUNCTION_NAME = 'ζ(s)'
+Z_CUTOFF = int(config['GENERATOR']['Z_CUTOFF'])
 # If true, hides some grid and axes for better looking animation
 ANIMATION_VIEW = config.getboolean('PLOTTER', 'ANIMATION_VIEW')
 # If true creates an image at every angle for animation.
@@ -108,7 +109,7 @@ def plot_complex_data():
     #print(Y)
 
     # Limits of Z axis
-    AX.set_zlim([0, 4])
+    AX.set_zlim([0, Z_CUTOFF])
     # Axi labels
     AX.set_xlabel('Re(s)')
     AX.set_ylabel('Im(s)')
