@@ -6,10 +6,22 @@ from matplotlib import cm
 import pylab
 import numpy as np
 
+import multiprocessing
+from multiprocessing import Pool
 from datetime import datetime
+
+def capture_plot_frame(angle):
+    # Rotation around Z axis
+    ax.view_init(elev=30, azim=angle)
+    # Figure names need to be consecutive integers for ffmpeg to work
+    fig_name = int(angle/angle_increments)
+    plt.savefig(f'{frames_path}{fig_name}.png', dpi = 300)
 
 startTime = datetime.now()
 print(f'Started at {startTime}')
+
+data_path = './data/'
+frames_path = './pics/'
 
 polar = True
 function_name = 'ζ(s)'
@@ -18,14 +30,16 @@ animation_view = False
 # If true creates an image at every angle for animation.
 # Only views the graph if false
 create_frames = False
+# Angle increments when creating frames for rotation around any axis
+angle_increments = 0.5
 
-with open('./data/Z_r.npy', 'rb') as fr:
+with open(f'{data_path}Z_r.npy', 'rb') as fr:
     Z_r = np.load(fr)
-with open('./data/Z_i.npy', 'rb') as fi:
+with open(f'{data_path}Z_i.npy', 'rb') as fi:
     Z_i = np.load(fi)
-with open('./data/X.npy', 'rb') as fx:
+with open(f'{data_path}X.npy', 'rb') as fx:
     X = np.load(fx)
-with open('./data/Y.npy', 'rb') as fy:
+with open(f'{data_path}Y.npy', 'rb') as fy:
     Y = np.load(fy)
 
 #print(Z_r)
@@ -87,18 +101,10 @@ cb.ax.set_title(f'arg({function_name})' if polar else f'Im({function_name})',fon
 if not create_frames:
     plt.show()
 else:
-    j = 0
-    angle = np.arange(0, 360.5, 0.5)
-    for i in angle:
-        i = round(i,2)
-        # Rotation around Z axis
-        ax.view_init(elev=30, azim=i)
-        # Rotation around X axis
-        # ax.view_init(elev=i, azim=270)
-        # Rotation around Y axis
-        # ax.view_init(elev=i, azim=0)
-        plt.savefig(f'./pics/{j}.png', dpi = 300)
-        j += 1
+    angle = np.arange(0, 15.5, angle_increments)
+    worker_count = multiprocessing.cpu_count()
+    p = Pool(worker_count)
+    out = p.map(capture_plot_frame, angle)
     plt.close()
 
-print(f'Execution time: {datetime.now() - startTime}')
+print(f'Execution time with {worker_count} workers: {datetime.now() - startTime}')
