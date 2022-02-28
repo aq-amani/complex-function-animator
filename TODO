@@ -1,0 +1,16 @@
+- option of plotting the imaginary part instead of real?
+- option whether to convert negative arg angles to positive or not?
+- README and test requirements
+
+
+# Productions
+- animate other zeta strips
+- plot X, Y rotation with more verbosity on powerful laptop
+- plot other complex functions. (reiman zeta in polar coordinate animation/ other interesting functions)
+
+- use the by frame animation method with number music player
+- play music from reimann zeros in polar form
+- use color maps with number music player
+
+# others
+Mandelbrot set
