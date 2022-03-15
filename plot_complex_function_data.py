@@ -38,6 +38,8 @@ ANGLE_INCREMENTS = float(config['PLOTTER']['ANGLE_INCREMENTS'])
 ROTATION_AXIS = config['PLOTTER']['ROTATION_AXIS']
 
 FIG = plt.figure(figsize=(7, 5))
+plt.style.use('dark_background')
+FIG.patch.set_facecolor('black')
 #ax = Axes3D(FIG)
 AX = FIG.add_subplot(projection='3d')
 FIG.tight_layout()
@@ -113,11 +115,12 @@ def plot_complex_data():
     # Axi labels
     AX.set_xlabel('Re(s)')
     AX.set_ylabel('Im(s)')
+    # Hide panes on the Z axis
+    AX.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+    AX.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
+
     if ANIMATION_VIEW:
         AX.grid(False)
-        # Hide panes on the Z axis
-        AX.w_xaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
-        AX.w_yaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         # Hide all axes
         #AX.set_axis_off()
 
@@ -130,6 +133,8 @@ def plot_complex_data():
         AX.set_zlabel(f'|{FUNCTION_NAME}|' if POLAR else f'Re({FUNCTION_NAME})')
         AX.zaxis.set_rotate_label(False)
         AX.zaxis.label.set_rotation(90)
+        # Hide XY plane
+        AX.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
         # Workaround to avoid Z axis and color bar labels to be too close
         AX.view_init(elev=30, azim=30)
 
