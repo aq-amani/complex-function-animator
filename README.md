@@ -12,12 +12,12 @@ A collection of scripts that can:
 
 ## :hammer_and_wrench: Setup/ Preparation
 ```bash
-pipenv install --ignore-pipfile --skip-lock --python 3.7
+pipenv install --ignore-pipfile --skip-lock --python 3.8
 pipenv shell
 ```
 If faced by `UserWarning: Matplotlib is currently using agg, which is a non-GUI backend, so cannot show the figure.`
 ```bash
-sudo apt-get install python3.7-tk
+sudo apt-get install python3.8-tk
 ```
 Make sure `ffmpeg` is installed to be able to create animated 3D plots
 
