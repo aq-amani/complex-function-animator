@@ -4,6 +4,12 @@ A collection of scripts that can:
 - Plot them in 3D using domain coloring
 - Create animations of rotating the resulting 3D graph around different axes
 
+## Example output using the Riemann-Zeta function (default function in this project)
+
+<p align="center">
+  <img src="./readme_images/riemann_zeta.gif" width="500" />
+</p>
+
 ## :hammer_and_wrench: Setup/ Preparation
 ```bash
 pipenv install --ignore-pipfile --skip-lock --python 3.7
